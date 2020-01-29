@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace test_env
 {
-    class Program
+    class test_env
     {
         static void Main(string[] args)
         {
@@ -34,8 +34,8 @@ namespace test_env
             {
                 sanitizedSystemEnv = systemEnv.Split(';').Select(path =>
                 {
-                    path = path.Replace("\\", "/");
-                    path = path.TrimEnd('/');
+                    path = path.Replace("/", "\\");
+                    path = path.TrimEnd('\\');
                     return path;
                 }).ToList();
             }
@@ -44,16 +44,16 @@ namespace test_env
             {
                 sanitizedUserEnv = userEnv.Split(';').Select(path =>
                 {
-                    path = path.Replace("\\", "/");
-                    path = path.TrimEnd('/');
+                    path = path.Replace("/", "\\");
+                    path = path.TrimEnd('\\');
                     return path;
                 }).ToList();
             }
 
             var sanitizedArgs = args[1].Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace append_path
+namespace prepend_path
 {
-    class Program
+    class prepend_path
     {
         static void Main(string[] args)
         {
@@ -14,7 +14,7 @@ namespace append_path
             // Check arguments
             if (args.Length <= 1)
             {
-                Console.WriteLine("Usage: append_path.exe [user/system] value[;value2]");
+                Console.WriteLine("Usage: prepend_path.exe [user/system] value[;value2]");
                 Console.WriteLine("Supports multiple test values ie: C:\\test;C:\\test_2");
                 Console.WriteLine("Returns 0 on success, -1 on failure, -2 on critical failure");
                 Environment.Exit(-2);
@@ -41,22 +41,22 @@ namespace append_path
             // Sanitize the inputs
             var sanitizedSystemPath = systemPath.Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 
             var sanitizedUserPath = userPath.Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 
             var sanitizedArgs = args[1].Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 
@@ -64,23 +64,23 @@ namespace append_path
 
             //
             // Prepend to path
-            if (sanitizedType == "machine" || sanitizedType == "system")
+            if(sanitizedType == "machine" || sanitizedType == "system")
             {
                 foreach (var sarg in sanitizedArgs)
                 {
                     Console.WriteLine("Prepending " + sarg + " to system path");
-                    sanitizedSystemPath.Add(sarg);
+                    sanitizedSystemPath.Insert(0, sarg);
                 }
 
                 var resultSystemPath = string.Join(";", sanitizedSystemPath);
                 Environment.SetEnvironmentVariable("Path", resultSystemPath, EnvironmentVariableTarget.Machine);
             }
-            else if (sanitizedType == "user")
+            else if(sanitizedType == "user")
             {
                 foreach (var sarg in sanitizedArgs)
                 {
                     Console.WriteLine("Prepending " + sarg + " to user path");
-                    sanitizedSystemPath.Add(sarg);
+                    sanitizedSystemPath.Insert(0, sarg);
                 }
 
                 var resultUserPath = string.Join(";", sanitizedUserPath);

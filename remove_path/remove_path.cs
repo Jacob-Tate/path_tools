@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace remove_env
+namespace remove_path
 {
-    class Program
+    class remove_path
     {
         static void Main(string[] args)
         {
@@ -14,7 +14,7 @@ namespace remove_env
             // Check arguments
             if (args.Length == 0)
             {
-                Console.WriteLine("Usage: remove_env.exe variable value[;value2]");
+                Console.WriteLine("Usage: remove_path.exe value[;value2]");
                 Console.WriteLine("Supports multiple test values ie: C:\\test;C:\\test_2");
                 Console.WriteLine("Returns 0 on success, -1 on failure, -2 on critical failure");
                 Environment.Exit(-2);
@@ -22,9 +22,8 @@ namespace remove_env
 
             //
             // Get the variables
-            var variable = args[0];
-            var systemPath = Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.Machine);
-            var userPath = Environment.GetEnvironmentVariable(variable, EnvironmentVariableTarget.User);
+            var systemPath = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.Machine);
+            var userPath = Environment.GetEnvironmentVariable("Path", EnvironmentVariableTarget.User);
 
             if (systemPath == null)
             {
@@ -42,22 +41,22 @@ namespace remove_env
             // Sanitize the inputs
             var sanitizedSystemPath = systemPath.Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 
             var sanitizedUserPath = userPath.Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 
-            var sanitizedArgs = args[1].Split(';').Select(path =>
+            var sanitizedArgs = args[0].Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 
@@ -74,21 +73,21 @@ namespace remove_env
             if (removed != 0)
             {
                 var resultSystemPath = string.Join(";", sanitizedSystemPath);
-                Environment.SetEnvironmentVariable(variable, resultSystemPath, EnvironmentVariableTarget.Machine);
+                Environment.SetEnvironmentVariable("Path", resultSystemPath, EnvironmentVariableTarget.Machine);
             }
 
             removed = 0;
 
             foreach (var sarg in sanitizedArgs)
             {
-                Console.WriteLine("Prepending " + sarg + " to user path");
+                Console.WriteLine("Removing " + sarg + " to user path");
                 removed += sanitizedSystemPath.RemoveAll(e => e == sarg);
             }
 
             if (removed != 0)
             {
                 var resultUserPath = string.Join(";", sanitizedUserPath);
-                Environment.SetEnvironmentVariable(variable, resultUserPath, EnvironmentVariableTarget.User);
+                Environment.SetEnvironmentVariable("Path", resultUserPath, EnvironmentVariableTarget.User);
             }
 
             Environment.Exit(0);

@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace prepend_env
+namespace append_env
 {
-    class Program
+    class append_env
     {
         static void Main(string[] args)
         {
@@ -14,7 +14,7 @@ namespace prepend_env
             // Check arguments
             if (args.Length <= 2)
             {
-                Console.WriteLine("Usage: prepend_env.exe [user/system] variable value[;value2]");
+                Console.WriteLine("Usage: append_env.exe [user/system] variable value[;value2]");
                 Console.WriteLine("Supports multiple values ie: C:\\test;C:\\test_2");
                 Console.WriteLine("Returns 0 on success, -1 on failure, -2 on critical failure");
                 Environment.Exit(-2);
@@ -38,8 +38,8 @@ namespace prepend_env
             {
                 sanitizedSystemEnv = systemEnv.Split(';').Select(path =>
                 {
-                    path = path.Replace("\\", "/");
-                    path = path.TrimEnd('/');
+                    path = path.Replace("/", "\\");
+                    path = path.TrimEnd('\\');
                     return path;
                 }).ToList();
             }
@@ -48,16 +48,16 @@ namespace prepend_env
             {
                 sanitizedUserEnv = userEnv.Split(';').Select(path =>
                 {
-                    path = path.Replace("\\", "/");
-                    path = path.TrimEnd('/');
+                    path = path.Replace("/", "\\");
+                    path = path.TrimEnd('\\');
                     return path;
                 }).ToList();
             }
 
             var sanitizedArgs = values.Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 
@@ -69,8 +69,8 @@ namespace prepend_env
             {
                 foreach (var sarg in sanitizedArgs)
                 {
-                    Console.WriteLine("Prepending " + sarg + " to system path");
-                    sanitizedSystemEnv.Insert(0, sarg);
+                    Console.WriteLine("Appending " + sarg + " to system path");
+                    sanitizedSystemEnv.Add(sarg);
                 }
 
                 var resultSystemEnv = string.Join(";", sanitizedSystemEnv);
@@ -80,8 +80,8 @@ namespace prepend_env
             {
                 foreach (var sarg in sanitizedArgs)
                 {
-                    Console.WriteLine("Prepending " + sarg + " to user path");
-                    sanitizedUserEnv.Insert(0, sarg);
+                    Console.WriteLine("Appending " + sarg + " to user path");
+                    sanitizedUserEnv.Add(sarg);
                 }
 
                 var resultUserEnv = string.Join(";", sanitizedUserEnv);

@@ -4,17 +4,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace remove_path
+namespace append_path
 {
-    class Program
+    class append_path
     {
         static void Main(string[] args)
         {
             //
             // Check arguments
-            if (args.Length == 0)
+            if (args.Length <= 1)
             {
-                Console.WriteLine("Usage: remove_path.exe value[;value2]");
+                Console.WriteLine("Usage: append_path.exe [user/system] value[;value2]");
                 Console.WriteLine("Supports multiple test values ie: C:\\test;C:\\test_2");
                 Console.WriteLine("Returns 0 on success, -1 on failure, -2 on critical failure");
                 Environment.Exit(-2);
@@ -41,53 +41,55 @@ namespace remove_path
             // Sanitize the inputs
             var sanitizedSystemPath = systemPath.Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 
             var sanitizedUserPath = userPath.Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
 
-            var sanitizedArgs = args[0].Split(';').Select(path =>
+            var sanitizedArgs = args[1].Split(';').Select(path =>
             {
-                path = path.Replace("\\", "/");
-                path = path.TrimEnd('/');
+                path = path.Replace("/", "\\");
+                path = path.TrimEnd('\\');
                 return path;
             }).ToList();
+
+            var sanitizedType = args[0].ToLower();
 
             //
-            // remove from path
-            int removed = 0;
-
-            foreach (var sarg in sanitizedArgs)
+            // Prepend to path
+            if (sanitizedType == "machine" || sanitizedType == "system")
             {
-                Console.WriteLine("Removing " + sarg + " from system path");
-                removed += sanitizedSystemPath.RemoveAll(e => e == sarg);
-            }
+                foreach (var sarg in sanitizedArgs)
+                {
+                    Console.WriteLine("Appending " + sarg + " to system path");
+                    sanitizedSystemPath.Add(sarg);
+                }
 
-            if (removed != 0)
-            {
                 var resultSystemPath = string.Join(";", sanitizedSystemPath);
                 Environment.SetEnvironmentVariable("Path", resultSystemPath, EnvironmentVariableTarget.Machine);
             }
-
-            removed = 0;
-
-            foreach (var sarg in sanitizedArgs)
+            else if (sanitizedType == "user")
             {
-                Console.WriteLine("Prepending " + sarg + " to user path");
-                removed += sanitizedSystemPath.RemoveAll(e => e == sarg);
-            }
+                foreach (var sarg in sanitizedArgs)
+                {
+                    Console.WriteLine("Appending " + sarg + " to user path");
+                    sanitizedSystemPath.Add(sarg);
+                }
 
-            if (removed != 0)
-            {
                 var resultUserPath = string.Join(";", sanitizedUserPath);
                 Environment.SetEnvironmentVariable("Path", resultUserPath, EnvironmentVariableTarget.User);
+            }
+            else
+            {
+                Console.WriteLine(sanitizedType + " is not a valid path type");
+                Environment.Exit(-2);
             }
 
             Environment.Exit(0);
